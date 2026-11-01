@@ -1,4 +1,4 @@
-import { userApis as defaultUserApis } from './config'
+import { userApis as defaultUserApis, legacySourceNames } from './config'
 import { STORE_NAMES } from '@common/constants'
 import getStore from '@main/utils/store'
 import zlib from 'node:zlib'
@@ -36,9 +36,16 @@ export const getUserApis = (): LX.UserApi.UserApiInfo[] => {
         i--
       }
     }
+    // 薛鸿忠音乐：清除旧版本内置、经实测不可用的失效音源
+    const filtered = infoFull.filter(api => !legacySourceNames.includes(api.name))
+    if (filtered.length != infoFull.length) {
+      console.log('[XHZ] removed legacy sources:', infoFull.length - filtered.length)
+      infoFull = filtered
+      requiredUpdate = true
+    }
   } else {
     infoFull = defaultUserApis
-    electronStore_userApi.set('userApis', userApis)
+    electronStore_userApi.set('userApis', infoFull)
   }
   userApis = infoFull.map(api => {
     if (api.allowShowUpdateAlert == null) api.allowShowUpdateAlert = false
