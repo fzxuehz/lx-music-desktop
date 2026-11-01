@@ -27,6 +27,18 @@ jobs:
           git status --porcelain
           npm run build
 
+      - name: Verify custom patches in dist
+        shell: pwsh
+        run: |
+          $files = Get-ChildItem dist -Recurse -Filter *.js
+          $regexHit = $files | Select-String -Pattern 'user_api\|builtin_' | Select-Object -First 1
+          if (-not $regexHit) { throw 'regex patch missing in dist' }
+          $idHit = $files | Select-String -SimpleMatch 'builtin_jiexiang' | Select-Object -First 1
+          if (-not $idHit) { throw 'builtin source id missing in dist' }
+          $srcHit = $files | Select-String -SimpleMatch 'gdstudio' | Select-Object -First 1
+          if (-not $srcHit) { throw 'builtin source scripts missing in dist' }
+          Write-Host "patch verified: $($regexHit.Path)"
+
       - name: Pack setup x64
         run: |
           npm run pack:win:setup:x64
