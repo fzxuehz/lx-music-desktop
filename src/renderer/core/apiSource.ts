@@ -18,7 +18,8 @@ export const setUserApi = async(apiId: string) => {
     })
   }
 
-  if (/^user_api/.test(apiId)) {
+  // 薛鸿忠音乐：内置源 id 以 builtin_ 开头，与官方 user_api 前缀一并视作用户音源
+  if (/^(user_api|builtin_)/.test(apiId)) {
     qualityList.value = {}
     userApi.status = false
     userApi.message = 'initing'
