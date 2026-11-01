@@ -33,10 +33,12 @@ jobs:
           $files = Get-ChildItem dist -Recurse -Filter *.js
           $regexHit = $files | Select-String -Pattern 'user_api\|builtin_' | Select-Object -First 1
           if (-not $regexHit) { throw 'regex patch missing in dist' }
-          $idHit = $files | Select-String -SimpleMatch 'builtin_jiexiang' | Select-Object -First 1
+          $idHit = $files | Select-String -SimpleMatch 'builtin_hyw' | Select-Object -First 1
           if (-not $idHit) { throw 'builtin source id missing in dist' }
-          $srcHit = $files | Select-String -SimpleMatch 'gdstudio' | Select-Object -First 1
-          if (-not $srcHit) { throw 'builtin source scripts missing in dist' }
+          $srcHit = $files | Select-String -SimpleMatch 'HYWmusic' | Select-Object -First 1
+          if (-not $srcHit) { throw 'hyw source script missing in dist' }
+          $legacyHit = $files | Select-String -SimpleMatch 'legacySourceNames' | Select-Object -First 1
+          if (-not $legacyHit) { throw 'legacy prune logic missing in dist' }
           Write-Host "patch verified: $($regexHit.Path)"
 
       - name: Pack setup x64
