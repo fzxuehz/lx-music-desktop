@@ -1,0 +1,47 @@
+name: Build Custom Windows
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build Windows x64
+    runs-on: windows-latest
+    env:
+      IS_CI: 'true'
+    steps:
+      - name: Check out git repository
+        uses: actions/checkout@v6
+
+      - name: Setup Node Env
+        env:
+          NPM_CACHE: ${{ env.NPM_CACHE }}
+        uses: ./.github/actions/setup
+
+      - name: Build src code
+        run: |
+          git status --porcelain
+          npm run build
+
+      - name: Pack setup x64
+        run: |
+          npm run pack:win:setup:x64
+          npm run pack:win:7z:x64
+
+      - name: List outputs
+        shell: pwsh
+        run: Get-ChildItem build | Select-Object Name, Length
+
+      - name: Upload Setup exe
+        uses: actions/upload-artifact@v4
+        with:
+          name: xhz-music-win-setup
+          path: build/*.exe
+          if-no-files-found: error
+
+      - name: Upload green 7z
+        uses: actions/upload-artifact@v4
+        with:
+          name: xhz-music-win-green
+          path: build/*.7z
+          if-no-files-found: error
